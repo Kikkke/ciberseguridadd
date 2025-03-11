@@ -9,6 +9,7 @@
 <body>
     <div class="container">
         <div class="row">
+            <!-- Texto a cifrar -->
             <div class="col-md-12">
                 <div class="form-group">
                     <label for="texto">Texto a cifrar:</label>
@@ -16,6 +17,7 @@
                 </div>
             </div>
 
+            <!-- Clave -->
             <div class="col-md-12">
                 <div class="form-group">
                     <label for="clave">Clave:</label>
@@ -23,15 +25,31 @@
                 </div>
             </div>
 
+            <!-- Botones -->
+            <div class="col-md-12">
+                <button id="btnCifrar" class="btn btn-primary">Cifrar</button>
+                <button id="btnDescifrar" class="btn btn-secondary">Descifrar</button>
+            </div>
+
+            <!-- Texto cifrado -->
             <div class="col-md-12">
                 <div class="form-group">
                     <label for="cifrado">Texto cifrado:</label>
                     <textarea id="cifrado" class="form-control" rows="4" readonly></textarea>
                 </div>
             </div>
+
+            <!-- Texto descifrado -->
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="descifrado">Texto descifrado:</label>
+                    <textarea id="descifrado" class="form-control" rows="4" readonly></textarea>
+                </div>
+            </div>
         </div>
     </div>
 
+    <!-- Enlace al archivo JavaScript -->
     <script src="vigenere.js"></script>
 </body>
 </html>
