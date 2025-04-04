@@ -1,4 +1,3 @@
-
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
@@ -13,40 +12,53 @@ public class DES extends JFrame {
     private File archivoSeleccionado;
     private SecretKey clave;
     private Cipher cifrador;
-    private final long MAX_FILE_SIZE = 1024 * 1024; // 1 MB máximo
+    private final long MAX_FILE_SIZE = 1024 * 1024; 
 
     public DES() {
-        super("Cifrado DES con Validaciones");
+        super("Cifrador DES Sencillo");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(700, 500);
-        setLayout(new BorderLayout());
-
-        // Inicializar componentes
+        setSize(600, 400);
+        setLocationRelativeTo(null);
+        
+        Color colorFondo = new Color(240, 240, 240);
+        Color colorBoton = new Color(70, 130, 180);
+        Color colorTextoBoton = Color.WHITE;
+        
+        JPanel panelPrincipal = new JPanel(new BorderLayout());
+        panelPrincipal.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panelPrincipal.setBackground(colorFondo);
+        
         textArea = new JTextArea();
         textArea.setEditable(false);
+        textArea.setFont(new Font("Arial", Font.PLAIN, 14));
         JScrollPane scrollPane = new JScrollPane(textArea);
-
+        
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        panelBotones.setBackground(colorFondo);
+        
         btnCargar = new JButton("Cargar Archivo");
         btnCifrar = new JButton("Cifrar");
-        btnCifrar.setEnabled(false);
         btnDescifrar = new JButton("Descifrar");
+        
+        for (JButton boton : new JButton[]{btnCargar, btnCifrar, btnDescifrar}) {
+            boton.setBackground(colorBoton);
+            boton.setForeground(colorTextoBoton);
+            boton.setFocusPainted(false);
+            boton.setPreferredSize(new Dimension(120, 30));
+            panelBotones.add(boton);
+        }
+        
+        btnCifrar.setEnabled(false);
         btnDescifrar.setEnabled(false);
-
+        
         fileChooser = new JFileChooser();
         fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Archivos de texto", "txt"));
-
-        // Panel de botones
-        JPanel panelBotones = new JPanel();
-        panelBotones.add(btnCargar);
-        panelBotones.add(btnCifrar);
-        panelBotones.add(btnDescifrar);
-
-        // Configurar eventos
+        
+        
         btnCargar.addActionListener(e -> cargarArchivo());
         btnCifrar.addActionListener(e -> cifrarArchivo());
         btnDescifrar.addActionListener(e -> descifrarYMostrar());
-
-        // Configurar generador de claves
+        
         try {
             KeyGenerator generadorDES = KeyGenerator.getInstance("DES");
             generadorDES.init(56);
@@ -56,10 +68,10 @@ public class DES extends JFrame {
             JOptionPane.showMessageDialog(this, "Error al inicializar DES: " + ex.getMessage(), 
                 "Error", JOptionPane.ERROR_MESSAGE);
         }
-
-        // Agregar componentes al frame
-        add(scrollPane, BorderLayout.CENTER);
-        add(panelBotones, BorderLayout.SOUTH);
+        
+        panelPrincipal.add(scrollPane, BorderLayout.CENTER);
+        panelPrincipal.add(panelBotones, BorderLayout.SOUTH);
+        add(panelPrincipal);
     }
 
     private void cargarArchivo() {
@@ -67,7 +79,6 @@ public class DES extends JFrame {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             archivoSeleccionado = fileChooser.getSelectedFile();
             
-            // Validación 1: Tamaño del archivo
             if (archivoSeleccionado.length() > MAX_FILE_SIZE) {
                 JOptionPane.showMessageDialog(this, 
                     "El archivo es demasiado grande. Máximo permitido: 1 MB",
@@ -78,32 +89,11 @@ public class DES extends JFrame {
             try (BufferedReader reader = new BufferedReader(new FileReader(archivoSeleccionado))) {
                 textArea.setText("");
                 String linea;
-                boolean caracteresInvalidos = false;
-                StringBuilder contenido = new StringBuilder();
-                
                 while ((linea = reader.readLine()) != null) {
-                    // Validación 2: Caracteres especiales
-                    if (!esTextoValido(linea)) {
-                        caracteresInvalidos = true;
-                    }
-                    contenido.append(linea).append("\n");
+                    textArea.append(linea + "\n");
                 }
-                
-                if (caracteresInvalidos) {
-                    JOptionPane.showMessageDialog(this,
-                        "El archivo contiene caracteres especiales no permitidos.\n" +
-                        "Solo se permite texto ASCII estándar (caracteres imprimibles).",
-                        "Advertencia", JOptionPane.WARNING_MESSAGE);
-                    textArea.setText("");
-                    btnCifrar.setEnabled(false);
-                    btnDescifrar.setEnabled(false);
-                    return;
-                }
-                
-                textArea.setText(contenido.toString());
                 btnCifrar.setEnabled(true);
                 btnDescifrar.setEnabled(false);
-                
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(this, 
                     "Error al leer el archivo: " + ex.getMessage(),
@@ -112,21 +102,8 @@ public class DES extends JFrame {
         }
     }
 
-    private boolean esTextoValido(String texto) {
-        // Permite caracteres ASCII imprimibles (32-126) y saltos de línea
-        return texto.chars().allMatch(c -> (c >= 32 && c <= 126) || c == '\n' || c == '\r');
-    }
-
     private void cifrarArchivo() {
         if (archivoSeleccionado == null) return;
-        
-        // Validación adicional antes de cifrar
-        if (textArea.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                "El archivo está vacío o no contiene texto válido para cifrar",
-                "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
         
         File archivoCifrado = new File(archivoSeleccionado.getAbsolutePath() + ".cifrado");
         
@@ -147,8 +124,8 @@ public class DES extends JFrame {
             }
             
             JOptionPane.showMessageDialog(this, 
-                "Archivo cifrado exitosamente:\n" + archivoCifrado.getAbsolutePath(),
-                "Cifrado completado", JOptionPane.INFORMATION_MESSAGE);
+                "Archivo cifrado exitosamente",
+                "Éxito", JOptionPane.INFORMATION_MESSAGE);
             
             btnDescifrar.setEnabled(true);
         } catch (Exception ex) {
@@ -162,14 +139,13 @@ public class DES extends JFrame {
         File archivoCifrado = new File(archivoSeleccionado.getAbsolutePath() + ".cifrado");
         if (!archivoCifrado.exists()) {
             JOptionPane.showMessageDialog(this, 
-                "No se encontró el archivo cifrado correspondiente",
+                "No se encontró el archivo cifrado",
                 "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         
         try {
             cifrador.init(Cipher.DECRYPT_MODE, clave);
-            
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             
             try (FileInputStream entrada = new FileInputStream(archivoCifrado)) {
@@ -183,12 +159,10 @@ public class DES extends JFrame {
                 baos.write(bufferFinal);
             }
             
-            String textoDescifrado = baos.toString("UTF-8");
-            textArea.setText(textoDescifrado);
-            
+            textArea.setText(baos.toString("UTF-8"));
             JOptionPane.showMessageDialog(this, 
-                "Texto descifrado mostrado en pantalla",
-                "Descifrado completado", JOptionPane.INFORMATION_MESSAGE);
+                "Texto descifrado mostrado",
+                "Éxito", JOptionPane.INFORMATION_MESSAGE);
             
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this,
@@ -200,7 +174,6 @@ public class DES extends JFrame {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             DES app = new DES();
-            app.setLocationRelativeTo(null); // Centrar la ventana
             app.setVisible(true);
         });
     }
