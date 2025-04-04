@@ -15,7 +15,7 @@ public class DES extends JFrame {
     private final long MAX_FILE_SIZE = 1024 * 1024; 
 
     public DES() {
-        super("Cifrador DES Sencillo");
+        super("Cifrado DES");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(600, 400);
         setLocationRelativeTo(null);
